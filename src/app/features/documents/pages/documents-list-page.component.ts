@@ -4,55 +4,61 @@ import { CommonModule } from '@angular/common';
 import { CmsApiService } from '../../../core/services/cms-api.service';
 import { CmsDocument } from '../../../core/models';
 import { PageHeaderComponent } from '../../../shared/components/page-header.component';
+import { CmsDocumentCardComponent} from "../../../shared/components/app-cms-document-card";
 
 @Component({
   standalone: true,
-  imports: [CommonModule, PageHeaderComponent],
+  imports: [CommonModule, PageHeaderComponent, CmsDocumentCardComponent],
   template: `
-    <app-page-header title="Documents" subtitle="Listing des documents + actions (mock)."></app-page-header>
+    <app-page-header title="Documents" subtitle="Listing des documents + actions."></app-page-header>
 
     <div class="card">
-      <table>
-        <thead>
-          <tr>
-            <th>Document</th>
-            <th>Last modified</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let d of docs">
-            <td>
-              <div style="font-weight:600">{{ d.id }}</div>
-              <span class="badge">{{ d.kind }}</span>
-            </td>
-            <td>{{ d.lastModifiedIso }}</td>
-            <td class="actions">
-              <a [href]="d.links['VIEW']" target="_blank" rel="noreferrer">VIEW</a>
-              <a [href]="d.links['EDIT']" target="_blank" rel="noreferrer">EDIT</a>
-              <a href="" (click)="onDelete($event, d.id)" style="color: var(--danger);">DELETE</a>
-              <a [href]="d.links['XML']" target="_blank" rel="noreferrer">XML</a>
-              <a [href]="'/mock/html/'+encode(d.id)" target="_blank" rel="noreferrer">HTML</a>
-              <a [href]="'/mock/pdf/'+encode(d.id)" target="_blank" rel="noreferrer">PDF</a>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-
-      <p class="muted" style="margin-top: 12px;">
-        À brancher : routes backend (VIEW/EDIT/DELETE/XML/HTML/PDF).
-      </p>
+      <app-cms-document-card
+        *ngFor="let d of docs"
+        [doc]="d"
+        [showDelete]="true"
+        (delete)="onDelete($event)">
+      </app-cms-document-card>
     </div>
   `
 })
 export class DocumentsListPageComponent implements OnInit {
   docs: CmsDocument[] = [];
   constructor(private api: CmsApiService) {}
-  ngOnInit(): void { this.api.listDocuments().subscribe(d => this.docs = d); }
-  encode(s: string): string { return encodeURIComponent(s); }
-  onDelete(ev: Event, id: string): void {
-    ev.preventDefault();
+
+  ngOnInit(): void {
+    this.api.listDocuments().subscribe(d => this.docs = d);
+  }
+
+  onDelete(id: string): void {
     if (!confirm(`Delete ${id} ?`)) return;
     this.api.deleteDocument(id).subscribe(() => this.docs = this.docs.filter(x => x.id !== id));
   }
+
+  // ordre “démo” lisible (obligatoires d’abord, puis le reste)
+  orderedActions(actions: CmsDocument['actions']): Array<{ label: string; href: string }> {
+    const order = [
+      'VIEW','EDIT','XML',
+      'MARKDOWN',
+      'RESUME','RESUME/PDF',
+      'PDF',
+      'ARTURIA PAGE','SKATELECTRIQUE PAGE',
+      'TEXTILE'
+    ];
+
+    const entries = Object.entries(actions ?? {})
+      .filter(([, href]) => !!href)
+      .map(([label, href]) => ({ label, href: href as string }));
+
+    const rank = new Map(order.map((k, i) => [k, i]));
+    return entries.sort((a, b) => (rank.get(a.label) ?? 999) - (rank.get(b.label) ?? 999));
+  }
+
+  onActionSelect(ev: Event, d: CmsDocument): void {
+    const sel = ev.target as HTMLSelectElement;
+    const href = sel.value;
+    if (href) window.open(href, '_blank', 'noopener,noreferrer');
+    sel.value = ''; // reset
+  }
+
 }

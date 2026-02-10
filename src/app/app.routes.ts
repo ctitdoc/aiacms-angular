@@ -16,6 +16,6 @@ export const APP_ROUTES: Routes = [
   { path: 'logs', component: LogsPageComponent },
   { path: 'restructure', component: RestructurePageComponent },
   { path: 'generate-cv', component: GenerateCvPageComponent },
-  { path: 'result/:id', component: ResultPageComponent },
+  { path: 'result', component: ResultPageComponent },
   { path: '**', redirectTo: 'documents' }
 ];

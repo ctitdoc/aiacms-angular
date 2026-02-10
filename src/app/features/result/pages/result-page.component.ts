@@ -1,32 +1,20 @@
-import { Component, OnInit } from '@angular/core';
+import { Component  } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { CmsApiService } from '../../../core/services/cms-api.service';
-import { ProcessResult } from '../../../core/models';
+import {CmsDocument, ProcessResult} from '../../../core/models';
 import { PageHeaderComponent } from '../../../shared/components/page-header.component';
-import { ResultLinksComponent } from '../../../shared/components/result-links.component';
+import { CmsDocumentCardComponent} from "../../../shared/components/app-cms-document-card";
 
 @Component({
   standalone: true,
-  imports: [CommonModule, PageHeaderComponent, ResultLinksComponent],
+  imports: [CommonModule, PageHeaderComponent, CmsDocumentCardComponent],
   template: `
-    <app-page-header title="Result" subtitle="Écran résultat (PJ5 / PJ6)."></app-page-header>
+    <app-page-header title="Result" subtitle="Écran résultat"></app-page-header>
 
-    <div class="card" *ngIf="result">
-      <h2 style="margin-top:0">{{ result.title }}</h2>
-      <app-result-links [links]="result.links"></app-result-links>
-
-      <div class="grid cols-2" style="margin-top: 12px;">
-        <div class="card" style="background: rgba(0,0,0,0.15);">
-          <h2>XML (mock)</h2>
-          <pre style="white-space: pre-wrap;">{{ result.xml }}</pre>
-        </div>
-        <div class="card" style="background: rgba(0,0,0,0.15);">
-          <h2>HTML (mock)</h2>
-          <pre style="white-space: pre-wrap;">{{ result.html }}</pre>
-        </div>
-      </div>
+    <div class="card" *ngIf="doc">
+      <app-cms-document-card *ngIf="doc" [doc]="doc"></app-cms-document-card>
 
       <div class="row" style="margin-top: 12px;">
         <button class="danger" (click)="delete()">DELETE (mock)</button>
@@ -35,20 +23,20 @@ import { ResultLinksComponent } from '../../../shared/components/result-links.co
       </div>
     </div>
 
-    <p class="muted" *ngIf="!result">Loading...</p>
+    <p class="muted" *ngIf="!doc">Loading...</p>
   `
 })
-export class ResultPageComponent implements OnInit {
-  result?: ProcessResult;
+export class ResultPageComponent  {
+  doc?: CmsDocument;
   status = '';
-  constructor(private route: ActivatedRoute, private api: CmsApiService, private router: Router) {}
-  ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id') ?? '';
-    this.api.getResultById(id).subscribe(r => this.result = r);
+  constructor(private route: ActivatedRoute, private api: CmsApiService, private router: Router) {
+    const nav = router.getCurrentNavigation();
+    this.doc = nav?.extras.state?.['document'];
+    if (!this.doc) this.router.navigate(['/documents']);
   }
   delete(): void {
-    if (!this.result) return;
-    if (!confirm(`Delete ${this.result.id} ?`)) return;
+    if (!this.doc) return;
+    if (!confirm(`Delete ${this.doc.id} ?`)) return;
     this.status = 'Deleted (mock).';
     setTimeout(() => this.router.navigate(['/documents']), 400);
   }

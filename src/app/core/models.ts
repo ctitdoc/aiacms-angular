@@ -1,11 +1,23 @@
-export type Feature = 'VIEW' | 'EDIT' | 'XML';
+// Features connues (mais on tolère aussi des tokens inconnus vus dans les données)
+export type Feature =
+  | 'VIEW' | 'EDIT' | 'XML'
+  | 'MARKDOWN' | 'RESUME' | 'ARTURIA' | 'SKATELECTRIQUE' | 'TEXTILE' | 'PDF'
+  | (string & {}); // fallback pour tokens inattendus
+
+export type ActionKey =
+  | 'VIEW' | 'EDIT' | 'XML'
+  | 'MARKDOWN'
+  | 'RESUME' | 'RESUME/PDF'
+  | 'ARTURIA PAGE' | 'SKATELECTRIQUE PAGE'
+  | 'TEXTILE' | 'PDF'
+  | (string & {}); // fallback
 
 export interface CmsDocument {
   id: string;
+  kind: string;
   lastModifiedIso: string;
   features: Feature[];
-  links: Partial<Record<Feature, string>>;
-  kind: string;
+  actions: Partial<Record<ActionKey, string>>;
 }
 
 export interface QueryResult {

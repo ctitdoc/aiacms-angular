@@ -20,7 +20,7 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
         <a routerLink="/generate-cv" routerLinkActive="active">Generate CV for offer</a>
       </nav>
       <p class="muted" style="margin:14px 8px 0;font-size:12px;line-height:1.4;">
-        UI mock. Remplacer progressivement les mocks par appels HTTP vers BaseX / RESTXQ.
+        UI mock. Remplacer progressivement les mocks par appels des endpoint backend.
       </p>
     </aside>
 

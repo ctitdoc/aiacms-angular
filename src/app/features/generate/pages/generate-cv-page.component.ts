@@ -38,9 +38,20 @@ export class GenerateCvPageComponent {
   constructor(private api: CmsApiService, private router: Router) {}
   generate(): void {
     this.status = 'Processing...';
-    this.api.generateCvForOffer({ offerText: this.offerText, rulesText: this.rulesText }).subscribe(r => {
-      this.status = '';
-      this.router.navigate(['/result', r.id]);
+
+    this.api.generateCvForOffer({
+      text_document: this.offerText,
+      prePromptFile: this.rulesText
+    }).subscribe({
+      next: (doc) => {
+        this.status = '';
+        this.router.navigate(['/result'], {
+          state: { document: doc }
+        });
+      },
+      error: (e) => {
+        this.status = `Error: ${e?.message ?? e}`;
+      }
     });
   }
 }

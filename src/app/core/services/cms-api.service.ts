@@ -23,7 +23,7 @@ export class CmsApiService {
   private documents: CmsDocument[] = [
     { id: 'content/dictionary_cv_courvant_v6.xml', lastModifiedIso: '2026-02-09T16:18:19+01:00', kind: 'resume',
       "features": ["VIEW","EDIT","XML"],
-      "links":  {
+      "actions":  {
         "VIEW": "/cms/get_dict_file_content_request?file=mock",
         "EDIT": "/static/editor/xopus/xopus.html#/cms/edit_dict_file_request?file=mock",
         "XML":  "/cms/get_dict_file_xml_content_request?file=mock"
@@ -32,7 +32,7 @@ export class CmsApiService {
     },
     { id: 'content/dictionary_cv_courvant_v5.xml', lastModifiedIso: '2026-02-08T16:18:19+01:00', kind: 'resume',
       "features": ["VIEW","EDIT","XML"],
-      "links":  {
+      "actions":  {
         "VIEW": "/cms/get_dict_file_content_request?file=mock",
         "EDIT": "/static/editor/xopus/xopus.html#/cms/edit_dict_file_request?file=mock",
         "XML":  "/cms/get_dict_file_xml_content_request?file=mock"
@@ -50,16 +50,15 @@ export class CmsApiService {
     if (!fileName.trim()) return throwError(() => new Error('Nom de document requis.'));
     const doc: CmsDocument = {
       id: `content/${fileName.trim()}`,
-      lastModifiedIso: nowIso(),
+      lastModifiedIso: new Date().toISOString(),
       kind: 'generic',
-      "features": ["VIEW","EDIT","XML"],
-      "links":  {
-        "VIEW": "/cms/get_dict_file_content_request?file=mock",
-        "EDIT": "/static/editor/xopus/xopus.html#/cms/edit_dict_file_request?file=mock",
-        "XML":  "/cms/get_dict_file_xml_content_request?file=mock"
+      features: ['VIEW', 'EDIT', 'XML'],
+      actions: {
+        VIEW: '/cms/get_dict_file_content_request?file=mock',
+        EDIT: '/static/editor/xopus/xopus.html#/cms/edit_dict_file_request?file=mock',
+        XML:  '/cms/get_dict_file_xml_content_request?file=mock'
       }
     };
-    this.documents = [doc, ...this.documents];
     return of(doc).pipe(delay(250));
   }
 
@@ -97,21 +96,16 @@ export class CmsApiService {
     }).pipe(delay(800));
   }
 
-  generateCvForOffer(req: GenerateCvRequest): Observable<ProcessResult> {
-    const id = makeId('dictionary_cv_for_job_offer_demo');
-    return of({
-      id,
-      title: `CV generated as XML document content/${id}.xml`,
-      links: [
-        { label: 'EDIT', href: `/mock/edit/${id}` },
-        { label: 'DELETE', href: `/mock/delete/${id}` },
-        { label: 'RESUME', href: `/mock/resume/${id}` },
-        { label: 'RESUME PDF', href: `/mock/resume_pdf/${id}` },
-        { label: 'XML', href: `/mock/xml/${id}` }
-      ],
-      xml: `<document><h>Resume</h><p>MOCK CV cible généré</p></document>`,
-      html: `<h1>Resume</h1><p>MOCK</p>`
-    }).pipe(delay(950));
+  generateCvForOffer(req: { text_document: string; prePromptFile?: string }) {
+    const body = new URLSearchParams();
+    body.set('text_document', req.text_document);
+    if (req.prePromptFile) body.set('prePromptFile', req.prePromptFile);
+
+    return this.http.post<CmsDocument>(
+      '/cms/get_resume_for_job_offer_request_json',
+      body.toString(),
+      { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+    );
   }
 
   getResultById(id: string): Observable<ProcessResult> {
