@@ -1,0 +1,13 @@
+{
+  "/cms": {
+    "target": "http://www.sitems.org:16386",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  },
+  "/static": {
+    "target": "http://www.sitems.org:16386",
+    "secure": false,
+    "changeOrigin": true
+  }
+}
