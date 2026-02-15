@@ -67,3 +67,5 @@ th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--lin
 th { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; }
 .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); font-size: 12px; }
 .actions a { margin-right: 10px; white-space: nowrap; }
+
+.filters-row { align-items: flex-start; }
