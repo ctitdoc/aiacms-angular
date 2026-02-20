@@ -8,7 +8,7 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
   template: `
   <div class="layout">
     <aside class="sidebar">
-      <div class="brand">aiacms-angular</div>
+      <div class="brand">aiacms-angular v0.4</div>
       <nav class="nav">
         <a routerLink="/documents" routerLinkActive="active">Home / List documents</a>
         <a routerLink="/record-document" routerLinkActive="active">Record document</a>

@@ -12,7 +12,7 @@ import { CmsDocumentCardComponent } from "../../../shared/components/app-cms-doc
   standalone: true,
   imports: [CommonModule, FormsModule, PageHeaderComponent, CmsDocumentCardComponent],
   template: `
-    <app-page-header title="Documents" subtitle="Listing des documents + actions (v4).">
+    <app-page-header title="Documents" subtitle="Listing des documents + actions.">
       <div class="row">
         <button class="ghost" (click)="reload()" [disabled]="loading">Reload</button>
         <button class="ghost" (click)="toggleSort()">
